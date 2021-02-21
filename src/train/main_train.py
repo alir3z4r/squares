@@ -1,26 +1,4 @@
-def map_side_to_square(height, width, i_side):
-    """
-    Maps the side index to squares
-    """
-    cells = []
-    irow = i_side // (2*width + 1) 
-    i_row = irow if irow < height else height-1
-    icol = i_side %  (2*width + 1)
-    i_col = icol if icol<width else min(icol-width,width-1)
-    horizontal = True if icol<width else False
-    if horizontal:
-        if irow == 0 or irow == height:
-            cells.append([i_row,i_col,0 if irow == 0 else 2]) 
-        else:
-            cells.append([i_row,i_col,0])
-            cells.append([i_row-1,i_col,2])
-    else:
-        if icol == width or icol == 2*width:
-            cells.append([i_row,i_col,3 if icol==width else 1])
-        else:
-            cells.append([i_row,i_col,3])
-            cells.append([i_row,i_col-1,1])   
-    return cells
+from .train_utils import map_side_to_square, calc_squares_status 
 
 
 def main(args):
@@ -44,6 +22,8 @@ def main(args):
         for cell in filled_cells:
             squares[cell[0]][cell[1]][cell[2]] = 1
         print(squares)
+        num_counts = calc_squares_status(squares)
+        print(num_counts)
 
 if __name__ == "__main__":
     i_side = int(input("Enter side index: "))
