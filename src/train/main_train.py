@@ -1,7 +1,30 @@
 from .train_utils import map_side_to_square, calc_squares_status 
+from .train_utils import Board, Agent
 
 
 def main(args):
+    height, width = args.dims
+    board = Board(height, width)
+    i = 0
+    while i<len(board.sides):
+        i_side = int(input("Enter side index: "))            
+        if i_side<len(board.sides) and board.sides[i_side]==0:
+            board.update(i_side)
+            i += 1
+        elif i_side>=len(board.sides):
+            print("invalid")
+        else: 
+            print(f"side {i_side} has been already selected")
+        board.update(i_side)
+        board.print_out()
+        counts = board.squares_stat(True)
+        
+
+
+
+
+
+def main_old(args):
     height, width = args.dims
     sides = (2*width*height + height + width)*[0] 
     print(sides)
@@ -26,8 +49,13 @@ def main(args):
         print(num_counts)
 
 if __name__ == "__main__":
-    i_side = int(input("Enter side index: "))
+    #board = Board(4,6)
+    #board.print_out()
+    #i_side = int(input("Enter side index: "))
     cells = map_side_to_square(4,6,i_side)
+    
+    #board.update(i_side)
+    #board.print_out()
     print(cells)
         
         
