@@ -78,7 +78,8 @@ class Board:
         sums_list = [sum(x) for row in self.squares for x in row]
         sums_list_squares = [[sum(x),j,i] for j,row in enumerate(self.squares) for i,x in enumerate(row)]
         num_counts = [sums_list.count(i) for i in range(5)]
-        print(f"Squares statistics: {num_counts}")
+        if do_print:
+            print(f"Squares statistics: {num_counts}")
         return num_counts, sums_list_squares
 
 
@@ -149,30 +150,20 @@ class Agent:
    
     def set_turn(self, is_turn):
         self.turn = is_turn
-    
-    
+       
     def decide(self, how='randomly'):
         stats, sums_list = self.board.squares_stat()
-        print(stats)
-        print(sums_list)
-        empty_sides = [i for i,s in enumerate(self.board.sides) if s==0]
-        print(empty_sides)
-        
+        empty_sides = [i for i,s in enumerate(self.board.sides) if s==0]      
         if how == 'randomly':
             stats4_before = stats[-1]
             selected_side = random.choice(empty_sides)
             self.board.update(selected_side)
             stats, sums_list = self.board.squares_stat()
             if stats[-1] == stats4_before:
-                self.Turn = False
+                self.turn = False
             else:
-                self.reward += 1
+                self.reward += stats[-1]-stats4_before
 
-
-
-            
-            
-        
     def move(self):
         pass
 
