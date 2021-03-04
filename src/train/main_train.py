@@ -14,6 +14,8 @@ def main(args):
         state_data = []
         action_data = []
         reward_data = []
+        next_state_data = []
+        delata_data = []
         board = Board(height, width)
         agent1 = Agent(board, 0, True)
         agent2 = Agent(board, 0, False)
@@ -25,6 +27,9 @@ def main(args):
                 state_data.append(counts_before)
                 agent1.decide()
                 action_data.append([agent1.action])
+                counts_after, _ = board.squares_stat()
+                next_state_data.append(counts_after)
+                delata_data.append([a-b for (a,b) in zip(counts_after, counts_before)])
                 if not agent1.turn:
                     agent2.set_turn(True)
                     reward_data.append([0])
@@ -51,4 +56,6 @@ def main(args):
     print(f"1 wins {win1} times, 2 wins {win2} times, tie {num_ties} times")
     print(len(reward_data))
     print(len(action_data), action_data)
-    print(len(state_data), state_data)
+    print("state: ",len(state_data), state_data)
+    print("next state: ",len(next_state_data), next_state_data)
+    print(delata_data)
