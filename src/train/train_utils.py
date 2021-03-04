@@ -5,7 +5,7 @@ class Board:
     def __init__(self, height, width):
         self.height = height
         self.width = width
-        self.sides = (2*width*height + height + width)*[0] 
+        self.sides = (2*width*height + height + width)*[0]
         self.squares = [[4*[0] for _ in range(width)] for _ in range(height)]
 
     def map_square_to_side(coords):
@@ -13,7 +13,7 @@ class Board:
         Maps an element of square board to a side index 
         """
         assert len(coords) == 3, "The coords must be of length 3"
-        num_by_row_before = coords[0] * (2*self.width + 1) 
+        num_by_row_before = coords[0] * (2*self.width + 1)
         if coords[3] == 0:
             i_side = num_by_row_before + coords[2]
         elif coords[3] == 1:
@@ -29,25 +29,26 @@ class Board:
         Maps the side index to squares
         """
         cells = []
-        irow = i_side // (2*self.width + 1) 
+        irow = i_side // (2*self.width + 1)
         i_row = irow if irow < self.height else self.height-1
-        icol = i_side %  (2*self.width + 1)
-        i_col = icol if icol<self.width else min(icol-self.width,self.width-1)
-        horizontal = True if icol<self.width else False
+        icol = i_side % (2*self.width + 1)
+        i_col = icol if icol < self.width else min(
+            icol-self.width, self.width-1)
+        horizontal = True if icol < self.width else False
         if horizontal:
             if irow == 0 or irow == self.height:
-                cells.append([i_row,i_col,0 if irow == 0 else 2]) 
+                cells.append([i_row, i_col, 0 if irow == 0 else 2])
             else:
-                cells.append([i_row,i_col,0])
-                cells.append([i_row-1,i_col,2])
+                cells.append([i_row, i_col, 0])
+                cells.append([i_row-1, i_col, 2])
         else:
             if icol == self.width or icol == 2*self.width:
-                cells.append([i_row,i_col,3 if icol==self.width else 1])
+                cells.append([i_row, i_col, 3 if icol == self.width else 1])
             else:
-                cells.append([i_row,i_col,3])
-                cells.append([i_row,i_col-1,1])
-        return cells  
-    
+                cells.append([i_row, i_col, 3])
+                cells.append([i_row, i_col-1, 1])
+        return cells
+
     def update(self, i_side, do_print=False):
         """
         Updates the board after adding a side
@@ -76,15 +77,12 @@ class Board:
         square board
         """
         sums_list = [sum(x) for row in self.squares for x in row]
-        sums_list_squares = [[sum(x),j,i] for j,row in enumerate(self.squares) for i,x in enumerate(row)]
+        sums_list_squares = [[sum(x), j, i] for j, row in enumerate(
+            self.squares) for i, x in enumerate(row)]
         num_counts = [sums_list.count(i) for i in range(5)]
         if do_print:
             print(f"Squares statistics: {num_counts}")
         return num_counts, sums_list_squares
-
-
-    
-
 
 
 def map_square_to_side(height, width, coords):
@@ -92,7 +90,7 @@ def map_square_to_side(height, width, coords):
     Maps an element of square board to a side index 
     """
     assert len(coords) == 3, "The coords must be of length 3"
-    num_by_row_before = coords[0] * (2*width + 1) 
+    num_by_row_before = coords[0] * (2*width + 1)
     if coords[3] == 0:
         i_side = num_by_row_before + coords[2]
     elif coords[3] == 1:
@@ -104,29 +102,28 @@ def map_square_to_side(height, width, coords):
     return i_side
 
 
-
 def map_side_to_square(height, width, i_side):
     """
     Maps the side index to squares
     """
     cells = []
-    irow = i_side // (2*width + 1) 
+    irow = i_side // (2*width + 1)
     i_row = irow if irow < height else height-1
-    icol = i_side %  (2*width + 1)
-    i_col = icol if icol<width else min(icol-width,width-1)
-    horizontal = True if icol<width else False
+    icol = i_side % (2*width + 1)
+    i_col = icol if icol < width else min(icol-width, width-1)
+    horizontal = True if icol < width else False
     if horizontal:
         if irow == 0 or irow == height:
-            cells.append([i_row,i_col,0 if irow == 0 else 2]) 
+            cells.append([i_row, i_col, 0 if irow == 0 else 2])
         else:
-            cells.append([i_row,i_col,0])
-            cells.append([i_row-1,i_col,2])
+            cells.append([i_row, i_col, 0])
+            cells.append([i_row-1, i_col, 2])
     else:
         if icol == width or icol == 2*width:
-            cells.append([i_row,i_col,3 if icol==width else 1])
+            cells.append([i_row, i_col, 3 if icol == width else 1])
         else:
-            cells.append([i_row,i_col,3])
-            cells.append([i_row,i_col-1,1])   
+            cells.append([i_row, i_col, 3])
+            cells.append([i_row, i_col-1, 1])
     return cells
 
 
@@ -136,7 +133,8 @@ def calc_squares_status(squares):
     square board
     """
     sums_list = [sum(x) for row in squares for x in row]
-    sums_list_squares = [[sum(x),j,i] for j,row in enumerate(squares) for i,x in enumerate(row)]
+    sums_list_squares = [[sum(x), j, i] for j, row in enumerate(
+        squares) for i, x in enumerate(row)]
     num_counts = [sums_list.count(i) for i in range(5)]
     return num_counts, sums_list_squares
 
@@ -147,17 +145,22 @@ class Agent:
         self.reward = reward
         self.starter = starter
         self.turn = True if starter else False
-   
+        self.action = None
+
     def set_turn(self, is_turn):
         self.turn = is_turn
-       
+
+    def add_reward(self, reward):
+        self.reward += reward
+
     def decide(self, how='randomly'):
         stats, sums_list = self.board.squares_stat()
-        empty_sides = [i for i,s in enumerate(self.board.sides) if s==0]      
+        empty_sides = [i for i, s in enumerate(self.board.sides) if s == 0]
         if how == 'randomly':
             stats4_before = stats[-1]
             selected_side = random.choice(empty_sides)
             self.board.update(selected_side)
+            self.action = self.board.map_side_to_square(selected_side)
             stats, sums_list = self.board.squares_stat()
             if stats[-1] == stats4_before:
                 self.turn = False
@@ -166,4 +169,3 @@ class Agent:
 
     def move(self):
         pass
-

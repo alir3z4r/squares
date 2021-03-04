@@ -1,6 +1,7 @@
 import argparse
 from utils.arguments import arguments
 from train.main_train import main as main_train
+from play.main_play import main as main_play
 
 
 def main():
@@ -12,7 +13,8 @@ def main():
         main_train(args)
     elif args.mode == "play":
         print("play mode ...")
-    
+        main_play(args)
+
 
 if __name__ == '__main__':
     main()
