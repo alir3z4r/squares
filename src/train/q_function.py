@@ -8,5 +8,5 @@ class Linear_Q(nn.Module):
         self.num_unique_squares = num_unique_squares
         self.linear_model = nn.Linear(num_unique_squares, 1)
 
-    def forward(squares_list):
-        self.linear_model(squares_list)
+    def forward(self, x):
+        return self.linear_model(x)

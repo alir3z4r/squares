@@ -3,6 +3,7 @@ from .train_utils import Board, Agent
 from .q_function import Linear_Q
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def main(args):
@@ -15,7 +16,9 @@ def main(args):
     criterion = torch.nn.MSELoss()
     model = Linear_Q(6)
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+    loss_list = []
     for epoch in range(args.epochs):
+        running_loss = 0
         optimizer.zero_grad()
         action_data = []
         state_data = []
@@ -68,13 +71,16 @@ def main(args):
             agg_reward_after = agent1.reward - agent2.reward
         agg_reward.append(agg_current_reward)
 
-        input_array = np.concatenate(
-            (np.array(state_data), np.array(action_data)), axis=1)
-        target_array = np.array(agg_reward)
-        output_array = Linear_Q(input_array)
+        input_array = torch.from_numpy(np.concatenate(
+            (np.array(state_data), np.array(np.expand_dims(action_data,axis=1))), axis=1)).type(torch.FloatTensor)
+        target_array = torch.tensor(agg_reward, dtype=torch.float).type(torch.FloatTensor)
+        output_array = model(input_array)
         loss = criterion(target_array, output_array)
         loss.backward()
-        loss.backward()
+        optimizer.step()
+        running_loss += loss.item()
+        print(f"Running loss at epoch {epoch} is {running_loss}")
+        loss_list.append(running_loss)
 
         if agent1.reward > agent2.reward:
             agent1.add_reward(100)
@@ -97,3 +103,5 @@ def main(args):
     print(len(agg_reward), agg_reward)
     print(len(action_data), action_data)
     print(list(zip(action_data, agg_reward)))
+    plt.plot(range(args.epochs), loss_list)
+    plt.show()
