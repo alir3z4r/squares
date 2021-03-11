@@ -72,14 +72,15 @@ def main(args):
         agg_reward.append(agg_current_reward)
 
         input_array = torch.from_numpy(np.concatenate(
-            (np.array(state_data), np.array(np.expand_dims(action_data,axis=1))), axis=1)).type(torch.FloatTensor)
-        target_array = torch.tensor(agg_reward, dtype=torch.float).type(torch.FloatTensor)
+            (np.array(state_data), np.array(np.expand_dims(action_data, axis=1))), axis=1)).type(torch.FloatTensor)
+        target_array = torch.tensor(
+            agg_reward, dtype=torch.float).type(torch.FloatTensor)
         output_array = model(input_array)
         loss = criterion(target_array, output_array)
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
-        print(f"Running loss at epoch {epoch} is {running_loss}")
+        #print(f"Running loss at epoch {epoch} is {running_loss}")
         loss_list.append(running_loss)
 
         if agent1.reward > agent2.reward:
@@ -103,5 +104,8 @@ def main(args):
     print(len(agg_reward), agg_reward)
     print(len(action_data), action_data)
     print(list(zip(action_data, agg_reward)))
-    plt.plot(range(args.epochs), loss_list)
+    avg_window_len = 100
+    loss_list_avg = [sum(loss_list[i:i+avg_window_len]) /
+                     avg_window_len for i in range(args.epochs-avg_window_len)]
+    plt.plot(range(args.epochs-avg_window_len), loss_list_avg)
     plt.show()
