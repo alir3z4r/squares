@@ -16,13 +16,13 @@ def main(args):
         i = 0
         while i < len(board.sides):
             i += 1
-            #print("turn: ", i)
+            print("turn: ", i)
             if agent1.turn:
-                agent1.decide()
+                agent1.decide("randomly")
                 if not agent1.turn:
                     agent2.set_turn(True)
             elif agent2.turn:
-                agent2.decide()
+                agent2.decide("rule_based")
                 if not agent2.turn:
                     agent1.set_turn(True)
             #print(f"agent1 score: {agent1.reward} {agent1.turn}")
