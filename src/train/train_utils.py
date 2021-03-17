@@ -190,7 +190,7 @@ class Agent(object):
         empty_sides = [i for i, s in enumerate(self.board.sides) if s == 0]
         print("empties: ", empty_sides)
         stats4_before = stats[-1]
-        if how == 'randomly':
+        if how == 'randomly' and len(empty_sides)>0:
             selected_side = random.choice(empty_sides)
             self.board.update(selected_side)
             self.action = self.board.map_side_to_square(selected_side)
@@ -227,12 +227,15 @@ class Agent(object):
                         self.board.update(selected_side)
                         self.action = self.board.map_side_to_square(selected_side)
                         lookfor = False
+                    
 
-            else:
+            elif (stats[0] + stats[1] + stats[3]==0 and stats[2]>0):
                 print("2")
                 selected_side = random.choice(empty_sides)
                 self.board.update(selected_side)
                 self.action = self.board.map_side_to_square(selected_side)
+            else:
+                print("Game Over!")
         stats, sums_list = self.board.squares_stat()
         if stats[-1] == stats4_before:
             self.turn = False
