@@ -202,7 +202,7 @@ class Agent(object):
                 selected_side = random.choice(esides3)
                 self.action = self.board.map_side_to_square(selected_side)
                 self.board.update(selected_side)
-            elif (stats[0] > 0 or stats[1] > 0):
+            elif ((stats[0] > 0 or stats[1] > 0) and stats[3]==0):
                 _, _, esides0 = empty_sides_Ksquares(self.board.squares, 0)
                 _, _, esides1 = empty_sides_Ksquares(self.board.squares, 1)
                 esides01 = list(set(esides0).union(set(esides1)))
