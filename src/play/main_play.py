@@ -16,13 +16,13 @@ def main(args):
         i = 0
         while i < len(board.sides):
             i += 1
-            print("turn: ", i)
+            #print("turn: ", i)
             if agent1.turn:
-                agent1.decide("randomly")
+                agent1.decide(args.playmode[0])
                 if not agent1.turn:
                     agent2.set_turn(True)
             elif agent2.turn:
-                agent2.decide("rule_based")
+                agent2.decide(args.playmode[1])
                 if not agent2.turn:
                     agent1.set_turn(True)
             #print(f"agent1 score: {agent1.reward} {agent1.turn}")
@@ -43,3 +43,4 @@ def main(args):
         score2 += agent2.reward
     print(score1, score2)
     print(f"1 wins {win1} times, 2 wins {win2} times, tie {num_ties} times")
+    #print(agent1.action_list, agent2.action_list)

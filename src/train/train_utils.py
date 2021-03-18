@@ -15,14 +15,14 @@ class Board(object):
         """
         assert len(coords) == 3, "The coords must be of length 3"
         num_by_row_before = coords[0] * (2*self.width + 1)
-        if coords[3] == 0:
-            i_side = num_by_row_before + coords[2]
-        elif coords[3] == 1:
-            i_side = num_by_row_before + self.width + 1 + coords[2]
-        elif coords[3] == 2:
-            i_side = num_by_row_before + 2*self.width + 1 + coords[2]
-        elif coords[3] == 3:
-            i_side = num_by_row_before + self.width + coords[2]
+        if coords[2] == 0:
+            i_side = num_by_row_before + coords[1]
+        elif coords[2] == 1:
+            i_side = num_by_row_before + self.width + 1 + coords[1]
+        elif coords[2] == 2:
+            i_side = num_by_row_before + 2*self.width + 1 + coords[1]
+        elif coords[2] == 3:
+            i_side = num_by_row_before + self.width + coords[1]
         return i_side
 
     def map_side_to_square(self, i_side):
@@ -56,7 +56,8 @@ class Board(object):
         """
         self.sides[i_side] = 1
         cells = self.map_side_to_square(i_side)
-        for cell in cells:
+        #print(len(cells)," ddd")
+        for cell in cells:            
             self.squares[cell[0]][cell[1]][cell[2]] = 1
         if do_print:
             self.print_out('both')
@@ -170,6 +171,16 @@ def calc_squares_status(squares):
     num_counts = [sums_list.count(i) for i in range(5)]
     return num_counts, sums_list_squares
 
+def update_square(squares, i_side):
+        """
+        Updates the board after adding a side
+        """
+        height, width = len(squares), len(squares[0])
+        cells = map_side_to_square(height, width, i_side)
+        #print(len(cells)," ddd")
+        for cell in cells:            
+            squares[cell[0]][cell[1]][cell[2]] = 1
+        return squares
 
 class Agent(object):
     def __init__(self, board, reward, starter):
@@ -178,6 +189,7 @@ class Agent(object):
         self.starter = starter
         self.turn = True if starter else False
         self.action = None
+        self.action_list = []
 
     def set_turn(self, is_turn):
         self.turn = is_turn
@@ -188,61 +200,76 @@ class Agent(object):
     def decide(self, how='randomly'):
         stats, _ = self.board.squares_stat()
         empty_sides = [i for i, s in enumerate(self.board.sides) if s == 0]
-        print("empties: ", empty_sides)
+        #print("empties: ", empty_sides)
         stats4_before = stats[-1]
         if how == 'randomly' and len(empty_sides)>0:
+            #print(stats)
             selected_side = random.choice(empty_sides)
+            #print("random:", selected_side)
             self.board.update(selected_side)
+            self.action_list.append(selected_side)
             self.action = self.board.map_side_to_square(selected_side)
-        elif how == "rule_based":
-            print(stats)
+        elif how == "rule_based" and len(empty_sides)>0:
+            #print(stats)
             if stats[3] > 0:
                 _, _, esides3 = empty_sides_Ksquares(self.board.squares, 3)
-                print("3", esides3)
+                #print("3", esides3)
                 selected_side = random.choice(esides3)
                 self.action = self.board.map_side_to_square(selected_side)
+                #print("updated3:", selected_side)
                 self.board.update(selected_side)
+                self.action_list.append(selected_side)
             elif ((stats[0] > 0 or stats[1] > 0) and stats[3]==0):
                 _, _, esides0 = empty_sides_Ksquares(self.board.squares, 0)
                 _, _, esides1 = empty_sides_Ksquares(self.board.squares, 1)
                 esides01 = list(set(esides0).union(set(esides1)))
-                print("01", esides01)
-                lookfor = True
-                
-                while lookfor:
-                    temp_board = copy.copy(self.board)
+                #print("01", esides01)
+                lookfor = True                
+                while lookfor:                    
                     if len(esides01)>0:
+                        temp_board = copy.deepcopy(self.board.squares)
                         selected_side = random.choice(esides01)
-                        temp_board.update(selected_side)
-                        new_stat, _ = temp_board.squares_stat()
-                        print(self.board.squares == temp_board.squares)
+                        stats2, _ = self.board.squares_stat()
+                        #print("temp board update")
+                        temp_board = update_square(temp_board, selected_side)
+                        stats3, _ = self.board.squares_stat()
+                        new_stat, _ = calc_squares_status(temp_board)
+                        #print(f"stats 2 and 3: {stats2} {stats3}")
+                        #print(self.board.squares == temp_board.squares)
                         if new_stat[3] == stats[3]:
                             lookfor = False
+                            #print("updated01 ", selected_side)
                             self.board.update(selected_side)
+                            self.action_list.append(selected_side)
                         else:
                             esides01 = [s for s in esides01 if s != selected_side]
                     else:
-                        print("22")
+                        #print("22")
                         selected_side = random.choice(empty_sides)
                         self.board.update(selected_side)
+                        self.action_list.append(selected_side)
+                        #print("updated22 ", selected_side)
                         self.action = self.board.map_side_to_square(selected_side)
-                        lookfor = False
-                    
-
+                        lookfor = False            
             elif (stats[0] + stats[1] + stats[3]==0 and stats[2]>0):
-                print("2")
+                #print("2")
                 selected_side = random.choice(empty_sides)
+                #print("updated2 ", selected_side)
                 self.board.update(selected_side)
+                self.action_list.append(selected_side)
                 self.action = self.board.map_side_to_square(selected_side)
             else:
                 print("Game Over!")
+        else:
+            #pass
+            print("Game Over!!!")
         stats, sums_list = self.board.squares_stat()
         if stats[-1] == stats4_before:
             self.turn = False
         else:
             self.reward += stats[-1]-stats4_before
         empty_sides = [i for i, s in enumerate(self.board.sides) if s == 0]
-        print("empties after: ", empty_sides)
+        #print("empties after: ", empty_sides)
 
     def move(self):
         pass
