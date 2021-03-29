@@ -60,7 +60,7 @@ def main(args):
                     reward_data.append(['a', 1])
                     agg_current_reward += 1
             elif agent2.turn:
-                agent2.decide()
+                agent2.decide("rule_based")
                 if not agent2.turn:
                     agent1.set_turn(True)
                     reward_data.append(['b', 0])

@@ -16,7 +16,6 @@ def main(args):
         i = 0
         while i < len(board.sides):
             i += 1
-            #print("turn: ", i)
             if agent1.turn:
                 agent1.decide(args.playmode[0])
                 if not agent1.turn:
@@ -25,20 +24,14 @@ def main(args):
                 agent2.decide(args.playmode[1])
                 if not agent2.turn:
                     agent1.set_turn(True)
-            #print(f"agent1 score: {agent1.reward} {agent1.turn}")
-            #print(f"agent2 score: {agent2.reward} {agent2.turn}")
-            #input("press to continue...")
         if agent1.reward > agent2.reward:
             agent1.add_reward(100)
             win1 += 1
-            #print("1 wins")
         elif agent1.reward < agent2.reward:
             agent2.add_reward(100)
             win2 += 1
-            #print("2 wins")
         else:
             num_ties += 1
-            # print("tie")
         score1 += agent1.reward
         score2 += agent2.reward
     print(score1, score2)
